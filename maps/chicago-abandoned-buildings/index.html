@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chicago Vacant and Abandoned Buildings</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<link href='/styles/master.css' media='all' rel='stylesheet' type='text/css' />
+
+<script type="text/javascript">
+  var map;
+  var geocoder;
+  
+  var fusionTableId = 388644;
+  var searchRadius = 1610; //in meters ~ 1 mile
+  var searchBuildings;
+  var buildings = new google.maps.FusionTablesLayer(fusionTableId);
+  var searchStr;
+  
+  function initialize() {
+  	geocoder = new google.maps.Geocoder();
+    var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+    var myOptions = {
+      zoom: 11,
+      center: chicago,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+    
+    document.getElementById("cbOccupied").checked = false;
+	document.getElementById("cbVacant").checked = false;
+	document.getElementById("cbUnknown").checked = false;
+	
+	searchBuildings = null;
+	
+	buildings.setMap(map);
+	document.getElementById("txtSearchAddress").value = "";
+  }
+	
+	function doSearch() 
+	{
+		clearSearch();
+		var address = document.getElementById("txtSearchAddress").value;
+		
+		var occupied = document.getElementById("cbOccupied").checked;
+		var vacant = document.getElementById("cbVacant").checked;
+		var unknown = document.getElementById("cbUnknown").checked;
+		
+		searchStr = "SELECT Address FROM " + fusionTableId + " WHERE Address not equal to ''";
+		
+		var searchType = "";
+		if (occupied || vacant || unknown)
+		{
+			if (occupied)
+				searchType += "'Occupied flag' = 1 OR ";
+			if (vacant)
+				searchType += "'Occupied flag' = 0 OR ";
+			if (unknown)
+				searchType += "'Occupied flag' = 2 OR ";
+				
+			searchStr += " AND " + searchType.slice(0,searchType.length-3);
+		}
+		
+		// because the geocode function does a callback, we have to handle it in both cases - when they search for and address and when they dont
+		if (address != "")
+		{
+			if (address.toLowerCase().indexOf("chicago") == -1)
+				address = address + " chicago";
+			geocoder.geocode( { 'address': address}, function(results, status) 
+			{
+			  if (status == google.maps.GeocoderStatus.OK) 
+			  {
+				//alert("found address: " + results[0].geometry.location.toString());
+				map.setCenter(results[0].geometry.location);
+				map.setZoom(14);
+				
+				searchStr += " AND ST_INTERSECTS(Address, CIRCLE(LATLNG" + results[0].geometry.location.toString() + "," + searchRadius + "))";
+				
+				//get TIF projects using all filters
+				searchBuildings = new google.maps.FusionTablesLayer(fusionTableId, {
+					query: searchStr}
+					);
+			
+				//alert(searchStr);
+				searchBuildings.setMap(map);
+			  } 
+			  else 
+			  {
+				alert("We could not find your address: " + status);
+			  }
+			});
+		}
+		else
+		{
+			//get TIF projects using all filters
+			searchBuildings = new google.maps.FusionTablesLayer(fusionTableId, {
+				query: searchStr}
+				);
+		
+			//alert(searchStr);
+			searchBuildings.setMap(map);
+		}
+		//alert(searchStr);
+  	}
+	
+	function clearSearch() {
+		if (searchBuildings != null)
+			searchBuildings.setMap(null);
+		
+		buildings.setMap(null);
+		
+	}
+
+</script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-20250560-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body onload="initialize()">
+		<div id="page"> 
+			<h1>Chicago Vacant and Abandoned Buildings</h1>
+			<span class='tagline'>All '311' calls for open and vacant buildings reported to the City of Chicago from January 1, 2010 to January 11, 2011</span>
+			<hr />
+			<div class="content-secondary">
+
+				<div id='search'>
+					<p>Find vacant and abandoned buildings using <strong>any</strong> or <strong>all</strong> of the fields below:</p>
+
+					<h4>Address</h4>
+					<input class='txt' type="text" id="txtSearchAddress" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/>
+					<br /><span class='mute'>ex: 'W 51st and S Morgan' or '5500 W Chicago Ave'</span>
+					<br />
+					<br />
+					<h4>Occupied by homeless, children, gangs, etc</h4>
+					<ul class='options-h'>
+						<li><label for='cbOccupied'><input type='radio' name="type" id='cbOccupied' />Yes</label></li>
+						<li><label for='cbVacant'><input type='radio' name="type" id='cbVacant' />No</label></li>
+						<li><label for='cbUnknown'><input type='radio' name="type" id='cbUnknown' />Unknown</label></li>
+					</ul>
+					<br />
+					<div class='clear'></div>
+					<input class="btn" type="button" id="btnSearch" value="Search" onclick="doSearch();" />
+					<span class='mute'><a href='#' onclick="initialize();">reset map</a></span>
+					<hr />
+					<p class='mute'><br />The data used to build this map was provided by the <a href='http://data.cityofchicago.org/Government/Vacant-and-Abandoned-Buildings-Service-Requests/7nii-7srd'>Chicago Data Portal</a>. View the raw data in Fusion Tables <a href='http://www.google.com/fusiontables/DataSource?dsrcid=388644'>here</a>. Map and search integration by <a href='http://derekeder.com'>Derek Eder</a>.
+				</div>
+			</div>
+			<div class="content-primary">
+				<div id="map_canvas"></div>
+			</div>
+	</div>
+</body>
+</html>

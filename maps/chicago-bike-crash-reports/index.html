@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chicago Bike Crash Reports</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<link href='/styles/master.css' media='all' rel='stylesheet' type='text/css' />
+
+<script type="text/javascript">
+  var map;
+  var geocoder;
+  
+  var fusionTableId = 561840;
+  var searchRadius =800; //in meters ~ 1/2 mile
+  var searchCrashes;
+  var crashes = new google.maps.FusionTablesLayer(fusionTableId);
+  var searchStr;
+  
+  function initialize() {
+  	geocoder = new google.maps.Geocoder();
+    var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+    var myOptions = {
+      zoom: 11,
+      center: chicago,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+    
+    document.getElementById("cbInjury1").checked = false;
+	document.getElementById("cbInjury2").checked = false;
+	document.getElementById("cbInjury3").checked = false;
+	document.getElementById("cbInjury4").checked = false;
+	document.getElementById("cbInjury5").checked = false;
+	
+	document.getElementById("cbDaySun").checked = false;
+	document.getElementById("cbDayMon").checked = false;
+	document.getElementById("cbDayTue").checked = false;
+	document.getElementById("cbDayWed").checked = false;
+	document.getElementById("cbDayThu").checked = false;
+	document.getElementById("cbDayFri").checked = false;
+	document.getElementById("cbDaySat").checked = false;
+	
+	document.getElementById("ddlWeather").value = "";
+	document.getElementById("ddlLighting").value = "";
+	document.getElementById("ddlSurface").value = "";
+	
+	searchCrashes = null;
+	
+	crashes.setMap(map);
+	document.getElementById("txtSearchAddress").value = "";
+  }
+	
+	function doSearch() 
+	{
+		clearSearch();
+		var address = document.getElementById("txtSearchAddress").value;
+		
+		var injury1 = document.getElementById("cbInjury1").checked;
+		var injury2 = document.getElementById("cbInjury2").checked;
+		var injury3 = document.getElementById("cbInjury3").checked;
+		var injury4 = document.getElementById("cbInjury4").checked;
+		var injury5 = document.getElementById("cbInjury5").checked;
+		
+		var daySun = document.getElementById("cbDaySun").checked;
+		var dayMon = document.getElementById("cbDayMon").checked;
+		var dayTue = document.getElementById("cbDayTue").checked;
+		var dayWed = document.getElementById("cbDayWed").checked;
+		var dayThu = document.getElementById("cbDayThu").checked;
+		var dayFri = document.getElementById("cbDayFri").checked;
+		var daySat = document.getElementById("cbDaySat").checked;
+		
+		var weather = document.getElementById("ddlWeather").value;
+		var lighting = document.getElementById("ddlLighting").value;
+		var surface = document.getElementById("ddlSurface").value;
+		
+		searchStr = "SELECT geometry FROM " + fusionTableId + " WHERE geometry not equal to ''";
+		
+		var searchInjury = "";
+		if (injury1 || injury2 || injury3 || injury4 || injury5)
+		{
+			if (injury1)
+				searchInjury += "'injury' = 1 OR ";
+			if (injury2)
+				searchInjury += "'injury' = 2 OR ";
+			if (injury3)
+				searchInjury += "'injury' = 3 OR ";
+			if (injury4)
+				searchInjury += "'injury' = 4 OR ";
+			if (injury5)
+				searchInjury += "'injury' = 5 OR ";
+				
+			searchStr += " AND " + searchInjury.slice(0,searchInjury.length-3);
+		}
+		
+		var searchWeekDay = "";
+		if (daySun || dayMon || dayTue || dayWed || dayThu || dayFri || daySat)
+		{
+			if (daySun)
+				searchWeekDay += "'DAY_O_WEEK' = 'SUN' OR ";
+			if (dayMon)
+				searchWeekDay += "'DAY_O_WEEK' = 'MON' OR ";
+			if (dayTue)
+				searchWeekDay += "'DAY_O_WEEK' = 'TUE' OR ";
+			if (dayWed)
+				searchWeekDay += "'DAY_O_WEEK' = 'WED' OR ";
+			if (dayThu)
+				searchWeekDay += "'DAY_O_WEEK' = 'THU' OR ";
+			if (dayFri)
+				searchWeekDay += "'DAY_O_WEEK' = 'FRI' OR ";
+			if (daySat)
+				searchWeekDay += "'DAY_O_WEEK' = 'SAT' OR ";
+				
+			searchStr += " AND " + searchWeekDay.slice(0,searchWeekDay.length-3);
+		}
+		
+		if (weather != '')
+			searchStr += " AND 'WEATHER' = '" + weather + "' "; 
+		if (lighting != '')
+			searchStr += " AND 'LIGHTING' = '" + lighting + "' "; 
+		if (surface != '')
+			searchStr += " AND 'SURF_COND' = '" + surface + "' "; 
+		
+		// because the geocode function does a callback, we have to handle it in both cases - when they search for and address and when they dont
+		if (address != "")
+		{
+			if (address.toLowerCase().indexOf("chicago") == -1)
+				address = address + " chicago";
+			geocoder.geocode( { 'address': address}, function(results, status) 
+			{
+			  if (status == google.maps.GeocoderStatus.OK) 
+			  {
+				//alert("found address: " + results[0].geometry.location.toString());
+				map.setCenter(results[0].geometry.location);
+				map.setZoom(14);
+				
+				searchStr += " AND ST_INTERSECTS(geometry, CIRCLE(LATLNG" + results[0].geometry.location.toString() + "," + searchRadius + "))";
+				
+				//get TIF projects using all filters
+				searchCrashes = new google.maps.FusionTablesLayer(fusionTableId, {
+					query: searchStr}
+					);
+			
+				//alert(searchStr);
+				searchCrashes.setMap(map);
+			  } 
+			  else 
+			  {
+				alert("We could not find your address: " + status);
+			  }
+			});
+		}
+		else
+		{
+			//get TIF projects using all filters
+			searchCrashes = new google.maps.FusionTablesLayer(fusionTableId, {
+				query: searchStr}
+				);
+		
+			//alert(searchStr);
+			searchCrashes.setMap(map);
+		}
+		//alert(searchStr);
+  	}
+	
+	function clearSearch() {
+		if (searchCrashes != null)
+			searchCrashes.setMap(null);
+		
+		crashes.setMap(null);
+		
+	}
+
+</script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-20250560-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body onload="initialize()">
+		<div id="page"> 
+			<h1>Chicago Bike Crash Reports</h1>
+			<span class='tagline'>4,931 reported bicycle crashes in the City of Chicago from 2007-2009, as reported to the Illinois Department of Transportation.</span>
+			<hr />
+			<div class="content-secondary">
+
+				<div id='search'>
+					<p>Find reported bicycle crashes using <strong>any</strong> or <strong>all</strong> of the fields below:</p>
+
+					<h4>Address</h4>
+					<input class='txt' type="text" id="txtSearchAddress" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/>
+					<br /><span class='mute'>ex: 'W 51st and S Morgan' or '5500 W Chicago Ave'</span>
+					<br />
+					<br />
+					<h4>Crash type</h4>
+					<ul class='options-v'>
+						<li><label for='cbInjury5'><input type='radio' name="injuryType" id='cbInjury5' />Fatality <span id='label-red'>(red)</span> - 12 total</label></li>
+						<li><label for='cbInjury1'><input type='radio' name="injuryType" id='cbInjury1' />Incapacitating injury <span id='label-purple'>(purple)</span> - 490 total</label></li>
+						<li><label for='cbInjury2'><input type='radio' name="injuryType" id='cbInjury2' />Non-incapacitating injury <span id='label-yellow'>(yellow)</span> - 2,237 total</label></li>
+						<li><label for='cbInjury3'><input type='radio' name="injuryType" id='cbInjury3' />Possible injury <span id='label-green'>(green)</span> - 1,884 total</label></li>
+						<li><label for='cbInjury4'><input type='radio' name="injuryType" id='cbInjury4' />Property damage <span id='label-blue'>(blue)</span> - 308 total</label></li>
+					</ul>
+					<h4>Day of the week</h4>
+					<ul class='options-h options-days'>
+						<li><label for='cbDaySun'><input type='radio' name="dayOfWeek" id='cbDaySun' />Sun</label></li>
+						<li><label for='cbDayMon'><input type='radio' name="dayOfWeek" id='cbDayMon' />Mon</label></li>
+						<li><label for='cbDayTue'><input type='radio' name="dayOfWeek" id='cbDayTue' />Tue</label></li>
+						<li><label for='cbDayWed'><input type='radio' name="dayOfWeek" id='cbDayWed' />Wed</label></li>
+						<li><label for='cbDayThu'><input type='radio' name="dayOfWeek" id='cbDayThu' />Thu</label></li>
+						<li><label for='cbDayFri'><input type='radio' name="dayOfWeek" id='cbDayFri' />Fri</label></li>
+						<li><label for='cbDaySat'><input type='radio' name="dayOfWeek" id='cbDaySat' />Sat</label></li>
+					</ul>
+					<h4>Weather</h4>
+					<select id='ddlWeather'>
+						<option value=''>Select type of weather</option>
+						<option value='CLEAR'>Clear</option>
+						<option value='RAIN'>Rain</option>
+						<option value='FOG/SMOKE/HAZE'>Fog, smoke, or haze</option>
+						<option value='SEVERE CROSS WIND'>Severe cross wind</option>
+						<option value='SLEET/HAIL'>Sleet or hail</option>
+						<option value='SNOW'>Snow</option>
+					</select>
+					<h4>Lighting</h4>
+					<select id='ddlLighting'>
+						<option value=''>Select lighting condition</option>
+						<option value='DAYLIGHT'>Daylight</option>
+						<option value='DARKNESS'>Darkness</option>
+						<option value='DARKNESS, LIGHTED ROAD'>Darkness with lighted road</option>
+						<option value='DAWN'>Dawn</option>
+						<option value='DUSK'>Dusk</option>
+					</select>
+					<h4>Surface condition</h4>
+					<select id='ddlSurface'>
+						<option value=''>Select surface condition</option>
+						<option value='DRY'>Dry</option>
+						<option value='WET'>Wet</option>
+						<option value='SAND, MUD, DIRT'>Sand, mud, or dirt</option>
+						<option value='SNOW OR SLUSH'>Snow or slush</option>
+						<option value='ICE'>Ice</option>
+					</select>
+					<br />
+					<br />
+					<div class='clear'></div>
+					<input class="btn" type="button" id="btnSearch" value="Search" onclick="doSearch();" />
+					<span class='mute'><a href='#' onclick="initialize();">reset map</a></span>
+					<hr />
+					<p class='mute'><br />Data formatting and original map by <a href='http://stevevance.net/gmaps/bikecrash.htm'>Seve Vance</a>. Data comes from the Illinois Department of Transportation (IDOT), Division of Traffic Safety and the reports for Chicago come from the Chicago Police Department (CPD). View the raw data in Fusion Tables <a href='http://www.google.com/fusiontables/DataSource?snapid=141103'>here</a>. Map and search integration by <a href='http://derekeder.com'>Derek Eder</a>.
+				</div>
+			</div>
+			<div class="content-primary">
+				<div id="map_canvas"></div>
+			</div>
+	</div>
+</body>
+</html>
