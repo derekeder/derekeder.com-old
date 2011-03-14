@@ -87,7 +87,10 @@ ul.c2l, ul.c2r { list-style: none; margin-left: 0; }
 
 .content-primary { float: right; padding-left: 10px; width: 70%; height: 95%; }
 .content-secondary { float: left; width: 28%; }
-.content-home { margin: auto; padding-top: 100px; width: 500px; }
+.content-home { margin: auto; padding: 50px 0; width: 710px; }
+.content-home h1 { width: 100%; }
+.home-left { float: left; width: 180px; padding: 0 5px; }
+.home-right { float: right; width: 500px; }
 .content-simple { margin: auto; width: 700px; } 
 .content-simple  p { margin-top: .25em; }
 
