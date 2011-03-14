@@ -64,6 +64,8 @@
 <script type="text/javascript">
   var map;
   var geocoder;
+  var addrMarker;
+  var addrMarkerImage = 'http://derekeder.com/images/icons/blue-pushpin.png';
   
   var projectMapId = 372874;
   var wardMapId = 306615;
@@ -193,6 +195,13 @@
 				map.setCenter(results[0].geometry.location);
 				map.setZoom(14);
 				
+				addrMarker = new google.maps.Marker({
+				  position: results[0].geometry.location, 
+				  map: map, 
+				  icon: addrMarkerImage,
+				  title:address
+				});
+				
 				searchStr += " AND ST_INTERSECTS(Address, CIRCLE(LATLNG" + results[0].geometry.location.toString() + "," + searchRadius + "))";
 				
 				//get TIF projects using all filters
@@ -229,6 +238,8 @@
 			searchWards.setMap(null);
 		if (searchDistricts != null)
 			searchDistricts.setMap(null);
+		if (addrMarker != null)
+			addrMarker.setMap(null);	
 		
 		projects.setMap(null);
 		

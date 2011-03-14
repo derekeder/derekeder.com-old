@@ -38,7 +38,7 @@ legend { background: #fff; color: #352f8e; font-size: 1.7em; margin: 0 0 0 -0.5e
 legend em { color: #777; font-size: 0.7em; font-style: normal; font-weight: normal; margin-left: 0.3em; }
 ol { list-style: decimal; margin-left: 1.5em; }
 ol ol { list-style: lower-alpha; }
-select { padding: 0.1em 0.4em 0.1em 0.2em; }
+select { padding: 0.1em 0.2em; }
 sub { font-size: 10px; vertical-align: sub; }
 sup { font-size: 10px; vertical-align: super; }
 table { border-collapse: collapse; }
@@ -104,6 +104,9 @@ ul.c2l, ul.c2r { list-style: none; margin-left: 0; }
 .mute { color: #77787b; font-size: 12px; }
 p.mute { margin: 0; }
 
+/* Text boxes */
+  .ezpz-hint { color: #777; font-style: italic; }
+
 /* footer text */
 .footer { color: #77787b; font-size: 12px; }
 p.footer { margin-bottom: 0.4em; }
@@ -113,6 +116,9 @@ input, select, textarea { color: #414042; font-size: 1em; }
 textarea { height: 10em; }
 #search { font-size: 16px; }
 #search .txt { width: 100%; }
+.input-addr { width: 70%; float: left; } 
+.input-addr .txt { width: 100%; }
+.input-radius { width: 28%; float: right; }
 
 /* Options */
 .options-h, .options-v { list-style: none; margin: 0 0 1em 0; padding: 0; }
@@ -123,7 +129,7 @@ td .options-h, td .options-v { margin: 0; }
 .options-h li { display: inline; margin-right: 0.7em; white-space: nowrap; }
 .options-v li { padding-left: 25px; text-indent: -25px; }
 .options-v li p { margin: 0; text-indent: 0; }
-.options-days li { margin-right: 0.3em; }
+.options-days li { margin-right: 0.1em; }
 
 #amount-range, #year-range { margin: 0.5em 4em 0.5em 0.5em; width: 95%; }
 
@@ -159,3 +165,5 @@ td .options-h, td .options-v { margin: 0; }
 #label-blue { color: #7575db; }
 #label-purple { color: #cc66cc; }
 #label-red { color: #d73e3e; }
+
+#resultCount { float: right; font-weight: bold; font-size: 15px; margin-top: 8px; }

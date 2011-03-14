@@ -8,19 +8,28 @@
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script src="/source/jquery.ezpz_hint.min.js" type="text/javascript"></script>
 <link href='/styles/master.css' media='all' rel='stylesheet' type='text/css' />
 
 <script type="text/javascript">
   var map;
   var geocoder;
+  var addrMarker;
+  var addrMarkerImage = 'http://derekeder.com/images/icons/blue-pushpin.png';
   
   var fusionTableId = 561840;
-  var searchRadius =800; //in meters ~ 1/2 mile
+  var searchRadius = 805; //in meters ~ 1/2 mile
   var searchCrashes;
   var crashes = new google.maps.FusionTablesLayer(fusionTableId);
   var searchStr;
   
+  google.load('visualization', '1', {}); //used for custom SQL call to get count
+  
   function initialize() {
+	$(".hint").ezpz_hint();
+	$( "#resultCount" ).html("");
+  
   	geocoder = new google.maps.Geocoder();
     var chicago = new google.maps.LatLng(41.850033, -87.6500523);
     var myOptions = {
@@ -30,11 +39,18 @@
     };
     map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
     
+    var bikeLayer = new google.maps.BicyclingLayer();
+	bikeLayer.setMap(map);
+	
+	document.getElementById("ddlRadius").value = "805";
+    
+	document.getElementById("cbInjury0").checked = true;
     document.getElementById("cbInjury1").checked = false;
 	document.getElementById("cbInjury2").checked = false;
 	document.getElementById("cbInjury3").checked = false;
 	document.getElementById("cbInjury4").checked = false;
 	document.getElementById("cbInjury5").checked = false;
+	document.getElementById("cbIntersection").checked = false;
 	
 	document.getElementById("cbDaySun").checked = false;
 	document.getElementById("cbDayMon").checked = false;
@@ -59,11 +75,14 @@
 		clearSearch();
 		var address = document.getElementById("txtSearchAddress").value;
 		
+		searchRadius = document.getElementById("ddlRadius").value;
+		
 		var injury1 = document.getElementById("cbInjury1").checked;
 		var injury2 = document.getElementById("cbInjury2").checked;
 		var injury3 = document.getElementById("cbInjury3").checked;
 		var injury4 = document.getElementById("cbInjury4").checked;
 		var injury5 = document.getElementById("cbInjury5").checked;
+		var intersection = document.getElementById("cbIntersection").checked;
 		
 		var daySun = document.getElementById("cbDaySun").checked;
 		var dayMon = document.getElementById("cbDayMon").checked;
@@ -95,6 +114,9 @@
 				
 			searchStr += " AND " + searchInjury.slice(0,searchInjury.length-3);
 		}
+		
+		if (intersection)
+			searchStr += " AND 'intersect' = 1 "; 
 		
 		var searchWeekDay = "";
 		if (daySun || dayMon || dayTue || dayWed || dayThu || dayFri || daySat)
@@ -137,15 +159,23 @@
 				map.setCenter(results[0].geometry.location);
 				map.setZoom(14);
 				
+				addrMarker = new google.maps.Marker({
+				  position: results[0].geometry.location, 
+				  map: map, 
+				  icon: addrMarkerImage,
+				  animation: google.maps.Animation.DROP,
+				  title:address
+				});
+				
 				searchStr += " AND ST_INTERSECTS(geometry, CIRCLE(LATLNG" + results[0].geometry.location.toString() + "," + searchRadius + "))";
 				
-				//get TIF projects using all filters
+				//get using all filters
 				searchCrashes = new google.maps.FusionTablesLayer(fusionTableId, {
 					query: searchStr}
 					);
-			
-				//alert(searchStr);
+					
 				searchCrashes.setMap(map);
+				displayCount(searchStr);
 			  } 
 			  else 
 			  {
@@ -155,23 +185,47 @@
 		}
 		else
 		{
-			//get TIF projects using all filters
+			//get using all filters
 			searchCrashes = new google.maps.FusionTablesLayer(fusionTableId, {
 				query: searchStr}
 				);
 		
 			//alert(searchStr);
 			searchCrashes.setMap(map);
+			displayCount(searchStr);
 		}
-		//alert(searchStr);
   	}
 	
 	function clearSearch() {
 		if (searchCrashes != null)
 			searchCrashes.setMap(null);
+		if (addrMarker != null)
+			addrMarker.setMap(null);	
 		
 		crashes.setMap(null);
-		
+	}
+	
+	function displayCount(searchStr) {
+	  //set the query using the parameter
+	  var queryText = encodeURIComponent(searchStr);
+	  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
+	  
+	  //set the callback function
+	  query.send(getData);
+	}
+ 
+	//define callback function, this is called when the results are returned
+	function getData(response) {
+	  numRows = response.getDataTable().getNumberOfRows();
+	  if (numRows == "500")
+		numRows = "500+";
+	  var name = "reports";
+	  if (numRows == "1")
+		name = "report";
+	  $( "#resultCount" ).fadeOut(function() {
+        $( "#resultCount" ).html("found " + numRows + " " + name);
+      });
+	  $( "#resultCount" ).fadeIn();
 	}
 
 </script>
@@ -198,21 +252,34 @@
 			<div class="content-secondary">
 
 				<div id='search'>
-					<p>Find reported bicycle crashes using <strong>any</strong> or <strong>all</strong> of the fields below:</p>
+					<p>Find reported bike crashes using <strong>any</strong> of the fields below:</p>
 
-					<h4>Address</h4>
-					<input class='txt' type="text" id="txtSearchAddress" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/>
-					<br /><span class='mute'>ex: 'W 51st and S Morgan' or '5500 W Chicago Ave'</span>
-					<br />
-					<br />
+					<div class='input-addr'>
+						<h4>Address</h4>
+						<p><input class='txt hint' type="text" title="Enter an address or an intersection &hellip;" id="txtSearchAddress" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/></p>
+					</div>
+					<div class='input-radius'>
+						<h4>&nbsp;<span class='mute'>within &hellip;</span></h4>
+						<p>
+						<select id='ddlRadius'>
+							<option value='400'>2 blocks</option>
+							<option value='805'>1/2 mile</option>
+							<option value='1610'>1 mile</option>
+							<option value='3220'>2 miles</option>
+						</select>
+						</p>
+					</div>
+					<div class='clear'></div>
 					<h4>Crash type</h4>
 					<ul class='options-v'>
+						<li><label for='cbInjury0'><input type='radio' name="injuryType" id='cbInjury0' />All - 4,931 total</label></li>
 						<li><label for='cbInjury5'><input type='radio' name="injuryType" id='cbInjury5' />Fatality <span id='label-red'>(red)</span> - 12 total</label></li>
 						<li><label for='cbInjury1'><input type='radio' name="injuryType" id='cbInjury1' />Incapacitating injury <span id='label-purple'>(purple)</span> - 490 total</label></li>
 						<li><label for='cbInjury2'><input type='radio' name="injuryType" id='cbInjury2' />Non-incapacitating injury <span id='label-yellow'>(yellow)</span> - 2,237 total</label></li>
-						<li><label for='cbInjury3'><input type='radio' name="injuryType" id='cbInjury3' />Possible injury <span id='label-green'>(green)</span> - 1,884 total</label></li>
-						<li><label for='cbInjury4'><input type='radio' name="injuryType" id='cbInjury4' />Property damage <span id='label-blue'>(blue)</span> - 308 total</label></li>
+						<li><label for='cbInjury3'><input type='radio' name="injuryType" id='cbInjury3' />Possible injury <span id='label-blue'>(blue)</span> - 1,884 total</label></li>
+						<li><label for='cbInjury4'><input type='radio' name="injuryType" id='cbInjury4' />Property damage <span id='label-green'>(green)</span> - 308 total</label></li>
 					</ul>
+					<p><label for='cbIntersection'><input type='checkbox' name="cbIntersection" id='cbIntersection' /> At an intersection</label></p>
 					<h4>Day of the week</h4>
 					<ul class='options-h options-days'>
 						<li><label for='cbDaySun'><input type='radio' name="dayOfWeek" id='cbDaySun' />Sun</label></li>
@@ -223,41 +290,40 @@
 						<li><label for='cbDayFri'><input type='radio' name="dayOfWeek" id='cbDayFri' />Fri</label></li>
 						<li><label for='cbDaySat'><input type='radio' name="dayOfWeek" id='cbDaySat' />Sat</label></li>
 					</ul>
-					<h4>Weather</h4>
-					<select id='ddlWeather'>
-						<option value=''>Select type of weather</option>
+					<h4>Environment</h4>
+					<p><select id='ddlWeather'>
+						<option value=''>Select type of weather </option>
 						<option value='CLEAR'>Clear</option>
 						<option value='RAIN'>Rain</option>
 						<option value='FOG/SMOKE/HAZE'>Fog, smoke, or haze</option>
 						<option value='SEVERE CROSS WIND'>Severe cross wind</option>
 						<option value='SLEET/HAIL'>Sleet or hail</option>
 						<option value='SNOW'>Snow</option>
-					</select>
-					<h4>Lighting</h4>
-					<select id='ddlLighting'>
-						<option value=''>Select lighting condition</option>
+					</select></p>
+					<p><select id='ddlLighting'>
+						<option value=''>Select lighting condition </option>
 						<option value='DAYLIGHT'>Daylight</option>
 						<option value='DARKNESS'>Darkness</option>
 						<option value='DARKNESS, LIGHTED ROAD'>Darkness with lighted road</option>
 						<option value='DAWN'>Dawn</option>
 						<option value='DUSK'>Dusk</option>
-					</select>
-					<h4>Surface condition</h4>
-					<select id='ddlSurface'>
-						<option value=''>Select surface condition</option>
+					</select></p>
+					<p><select id='ddlSurface'>
+						<option value=''>Select surface condition </option>
 						<option value='DRY'>Dry</option>
 						<option value='WET'>Wet</option>
 						<option value='SAND, MUD, DIRT'>Sand, mud, or dirt</option>
 						<option value='SNOW OR SLUSH'>Snow or slush</option>
 						<option value='ICE'>Ice</option>
-					</select>
-					<br />
-					<br />
+					</select></p>
 					<div class='clear'></div>
 					<input class="btn" type="button" id="btnSearch" value="Search" onclick="doSearch();" />
 					<span class='mute'><a href='#' onclick="initialize();">reset map</a></span>
+					<span id='resultCount'>&nbsp;</span>
 					<hr />
-					<p class='mute'><br />Data formatting and original map by <a href='http://stevevance.net/gmaps/bikecrash.htm'>Seve Vance</a>. Data comes from the Illinois Department of Transportation (IDOT), Division of Traffic Safety and the reports for Chicago come from the Chicago Police Department (CPD). View the raw data in Fusion Tables <a href='http://www.google.com/fusiontables/DataSource?snapid=141103'>here</a>. Map and search integration by <a href='http://derekeder.com'>Derek Eder</a>.
+					<p class='mute'><br />Data formatting and original map by <a href='http://www.stevevance.net/planning'>Steven Vance</a>. <a href='http://www.stevevance.net/planning/why-the-chicago-bike-crash-map-doesnt-show-doorings/'>Reports of 'doorings' not included</a>.
+					<br /><br />Data comes from the Illinois Department of Transportation (IDOT), Division of Traffic Safety and the reports for Chicago come from the Chicago Police Department (CPD). 
+					View the raw data in Fusion Tables <a href='http://www.google.com/fusiontables/DataSource?dsrcid=561840'>here</a>. Map and search integration by <a href='http://derekeder.com'>Derek Eder</a>.
 				</div>
 			</div>
 			<div class="content-primary">
