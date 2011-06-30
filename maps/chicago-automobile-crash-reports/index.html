@@ -8,6 +8,7 @@
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<script src="/source/analytics_lib.js" type="text/javascript"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script src="/source/jquery.ezpz_hint.min.js" type="text/javascript"></script>
 <link href='/styles/master.css' media='all' rel='stylesheet' type='text/css' />
@@ -148,6 +149,7 @@
 		{
 			if (address.toLowerCase().indexOf("chicago") == -1)
 				address = address + " chicago";
+			_trackClickEventWithGA("Search", "Map", address);	
 			geocoder.geocode( { 'address': address}, function(results, status) 
 			{
 			  if (status == google.maps.GeocoderStatus.OK) 
@@ -224,20 +226,6 @@
       });
 	  $( "#resultCount" ).fadeIn();
 	}
-
-</script>
-
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-20250560-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
 
 </script>
 </head>
