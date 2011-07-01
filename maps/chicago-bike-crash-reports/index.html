@@ -28,7 +28,6 @@
   google.load('visualization', '1', {}); //used for custom SQL call to get count
   
   function initialize() {
-	$(".hint").ezpz_hint();
 	$( "#resultCount" ).html("");
   
   	geocoder = new google.maps.Geocoder();
@@ -229,10 +228,15 @@
       });
 	  $( "#resultCount" ).fadeIn();
 	}
+	
+	jQuery(document).ready(function() {
+        initialize();
+        jQuery(".hint").ezpz_hint();
+    });
 
 </script>
 </head>
-<body onload="initialize()">
+<body>
 		<div id="page"> 
 			<h1>Chicago Bike Crash Reports</h1>
 			<span class='tagline'>4,931 reported bicycle crashes in the City of Chicago from 2007-2009, as reported to the Illinois Department of Transportation.</span>

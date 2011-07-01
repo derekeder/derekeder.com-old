@@ -48,7 +48,6 @@
   google.load('visualization', '1', {}); //used for custom SQL call to get record count
   
   function initialize() {
-	$(".hint").ezpz_hint();
 	$( "#resultCount" ).html("");
   
   	geocoder = new google.maps.Geocoder();
@@ -176,10 +175,15 @@
       });
 	  $( "#resultCount" ).fadeIn();
 	}
+	
+	jQuery(document).ready(function() {
+        initialize();
+        jQuery(".hint").ezpz_hint();
+    });
 
 </script>
 </head>
-<body onload="initialize()">
+<body>
 		<div id="page"> 
 			<h1>Enter your title here</h1>
 			<span class='tagline'>Tagline or sentence describing your map</span>

@@ -28,7 +28,6 @@
   google.load('visualization', '1', {}); //used for custom SQL call to get count
   
   function initialize() {
-	$(".hint").ezpz_hint();
 	$( "#resultCount" ).html("");
   
   	geocoder = new google.maps.Geocoder();
@@ -184,10 +183,15 @@
       });
 	  $( "#resultCount" ).fadeIn();
 	}
+	
+	jQuery(document).ready(function() {
+        initialize();
+        jQuery(".hint").ezpz_hint();
+    });
 
 </script>
 </head>
-<body onload="initialize()">
+<body>
 		<div id="page"> 
 			<h1>Chicago Vacant and Abandoned Buildings</h1>
 			<span class='tagline'>4,590 service request (311) calls for open and vacant buildings reported to the City of Chicago from January 1, 2010 to March 15, 2011</span>

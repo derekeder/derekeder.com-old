@@ -32,7 +32,6 @@
   google.load('visualization', '1', {}); //used for custom SQL call to get count
   
   function initialize() {
-	$(".hint").ezpz_hint();
   
   	geocoder = new google.maps.Geocoder();
     var chicago = new google.maps.LatLng(40.148377, -89.364818);
@@ -169,10 +168,15 @@
 		Boundaries2011.setMap(null);
 		Boundaries2001.setMap(null);
 	}
+	
+	jQuery(document).ready(function() {
+        initialize();
+        jQuery(".hint").ezpz_hint();
+    });
 
 </script>
 </head>
-<body onload="initialize()">
+<body>
 		<div id="page"> 
 			<h1>2011 IL Senate Redistricting Plan</h1>
 			<hr />

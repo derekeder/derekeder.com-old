@@ -35,7 +35,6 @@
   google.load('visualization', '1', {}); //used for custom SQL call to get record count
   
   function initialize() {
-	$(".hint").ezpz_hint();
 	$( "#resultCount" ).html("");
   
   	geocoder = new google.maps.Geocoder();
@@ -195,10 +194,15 @@
       });
 	  $( "#resultCount" ).fadeIn();
 	}
+	
+	jQuery(document).ready(function() {
+        initialize();
+        jQuery(".hint").ezpz_hint();
+    });
 
 </script>
 </head>
-<body onload="initialize()">
+<body>
 		<div id="page"> 
 			<h1>Cook County Hospitals</h1>
 			<span class='tagline'>All hospitals in Cook County compared to ward and neighborhood. If anyone knows of a shapefile for neighborhoods outside Chicago, let me know.</span>
