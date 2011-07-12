@@ -44,21 +44,20 @@
 	
 	document.getElementById("ddlRadius").value = "805";
     
-	document.getElementById("cbInjury0").checked = true;
-    document.getElementById("cbInjury1").checked = false;
-	document.getElementById("cbInjury2").checked = false;
-	document.getElementById("cbInjury3").checked = false;
-	document.getElementById("cbInjury4").checked = false;
-	document.getElementById("cbInjury5").checked = false;
+    document.getElementById("cbInjury1").checked = true;
+	document.getElementById("cbInjury2").checked = true;
+	document.getElementById("cbInjury3").checked = true;
+	document.getElementById("cbInjury4").checked = true;
+	document.getElementById("cbInjury5").checked = true;
 	document.getElementById("cbIntersection").checked = false;
 	
-	document.getElementById("cbDaySun").checked = false;
-	document.getElementById("cbDayMon").checked = false;
-	document.getElementById("cbDayTue").checked = false;
-	document.getElementById("cbDayWed").checked = false;
-	document.getElementById("cbDayThu").checked = false;
-	document.getElementById("cbDayFri").checked = false;
-	document.getElementById("cbDaySat").checked = false;
+	document.getElementById("cbDaySun").checked = true;
+	document.getElementById("cbDayMon").checked = true;
+	document.getElementById("cbDayTue").checked = true;
+	document.getElementById("cbDayWed").checked = true;
+	document.getElementById("cbDayThu").checked = true;
+	document.getElementById("cbDayFri").checked = true;
+	document.getElementById("cbDaySat").checked = true;
 	
 	document.getElementById("ddlWeather").value = "";
 	document.getElementById("ddlLighting").value = "";
@@ -97,47 +96,41 @@
 		var surface = document.getElementById("ddlSurface").value;
 		
 		searchStr = "SELECT geometry FROM " + fusionTableId + " WHERE geometry not equal to ''";
-		
-		var searchInjury = "";
-		if (injury1 || injury2 || injury3 || injury4 || injury5)
-		{
-			if (injury1)
-				searchInjury += "'injury' = 1 OR ";
-			if (injury2)
-				searchInjury += "'injury' = 2 OR ";
-			if (injury3)
-				searchInjury += "'injury' = 3 OR ";
-			if (injury4)
-				searchInjury += "'injury' = 4 OR ";
-			if (injury5)
-				searchInjury += "'injury' = 5 OR ";
-				
-			searchStr += " AND " + searchInjury.slice(0,searchInjury.length-3);
-		}
+
+		var searchInjury = "'injury' IN (0,";
+        if (injury1)
+            searchInjury += "1,";
+        if (injury2)
+            searchInjury += "2,";
+        if (injury3)
+            searchInjury += "3,";
+        if (injury4)
+            searchInjury += "4,";
+		if (injury5)
+            searchInjury += "5,";
+
+        searchStr += " AND " + searchInjury.slice(0, searchInjury.length - 1) + ")";
 		
 		if (intersection)
 			searchStr += " AND 'intersect' = 1 "; 
-		
-		var searchWeekDay = "";
-		if (daySun || dayMon || dayTue || dayWed || dayThu || dayFri || daySat)
-		{
-			if (daySun)
-				searchWeekDay += "'DAY_O_WEEK' = 'SUN' OR ";
-			if (dayMon)
-				searchWeekDay += "'DAY_O_WEEK' = 'MON' OR ";
-			if (dayTue)
-				searchWeekDay += "'DAY_O_WEEK' = 'TUE' OR ";
-			if (dayWed)
-				searchWeekDay += "'DAY_O_WEEK' = 'WED' OR ";
-			if (dayThu)
-				searchWeekDay += "'DAY_O_WEEK' = 'THU' OR ";
-			if (dayFri)
-				searchWeekDay += "'DAY_O_WEEK' = 'FRI' OR ";
-			if (daySat)
-				searchWeekDay += "'DAY_O_WEEK' = 'SAT' OR ";
-				
-			searchStr += " AND " + searchWeekDay.slice(0,searchWeekDay.length-3);
-		}
+			
+		var searchWeekDay = "'DAY_O_WEEK' IN ('X',";
+        if (daySun)
+			searchWeekDay += "'SUN',";
+		if (dayMon)
+			searchWeekDay += "'MON',";
+		if (dayTue)
+			searchWeekDay += "'TUE',";
+		if (dayWed)
+			searchWeekDay += "'WED',";
+		if (dayThu)
+			searchWeekDay += "'THU',";
+		if (dayFri)
+			searchWeekDay += "'FRI',";
+		if (daySat)
+			searchWeekDay += "'SAT',";
+
+        searchStr += " AND " + searchWeekDay.slice(0, searchWeekDay.length - 1) + ")";
 		
 		if (weather != '')
 			searchStr += " AND 'WEATHER' = '" + weather + "' "; 
@@ -232,6 +225,9 @@
 	jQuery(document).ready(function() {
         initialize();
         jQuery(".hint").ezpz_hint();
+		jQuery(':checkbox').click(function(){
+			doSearch();
+		});
     });
 
 </script>
@@ -244,8 +240,26 @@
 			<div class="content-secondary">
 
 				<div id='search'>
+					<h4>Crash type</h4>
+					<ul class='options-v'>
+						<li><label for='cbInjury5'><input type='checkbox' id='cbInjury5' />Fatality <span id='label-red'>(red)</span> - 12 total</label></li>
+						<li><label for='cbInjury1'><input type='checkbox' id='cbInjury1' />Incapacitating injury <span id='label-purple'>(purple)</span> - 490 total</label></li>
+						<li><label for='cbInjury2'><input type='checkbox' id='cbInjury2' />Non-incapacitating injury <span id='label-yellow'>(yellow)</span> - 2,237 total</label></li>
+						<li><label for='cbInjury3'><input type='checkbox' id='cbInjury3' />Possible injury <span id='label-blue'>(blue)</span> - 1,884 total</label></li>
+						<li><label for='cbInjury4'><input type='checkbox' id='cbInjury4' />Property damage <span id='label-green'>(green)</span> - 308 total</label></li>
+					</ul>
+					<h4>Day of the week</h4>
+					<ul class='options-h options-days'>
+						<li><label for='cbDaySun'><input type='checkbox' id='cbDaySun' />Sun</label></li>
+						<li><label for='cbDayMon'><input type='checkbox' id='cbDayMon' />Mon</label></li>
+						<li><label for='cbDayTue'><input type='checkbox' id='cbDayTue' />Tue</label></li>
+						<li><label for='cbDayWed'><input type='checkbox' id='cbDayWed' />Wed</label></li>
+						<li><label for='cbDayThu'><input type='checkbox' id='cbDayThu' />Thu</label></li>
+						<li><label for='cbDayFri'><input type='checkbox' id='cbDayFri' />Fri</label></li>
+						<li><label for='cbDaySat'><input type='checkbox' id='cbDaySat' />Sat</label></li>
+					</ul>
+					<hr />
 					<p>Find reported bike crashes using <strong>any</strong> of the fields below:</p>
-
 					<div class='input-addr'>
 						<h4>Address</h4>
 						<p><input class='txt hint' type="text" title="Enter an address or an intersection &hellip;" id="txtSearchAddress" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/></p>
@@ -262,26 +276,7 @@
 						</p>
 					</div>
 					<div class='clear'></div>
-					<h4>Crash type</h4>
-					<ul class='options-v'>
-						<li><label for='cbInjury0'><input type='radio' name="injuryType" id='cbInjury0' onclick="doSearch();" />All - 4,931 total</label></li>
-						<li><label for='cbInjury5'><input type='radio' name="injuryType" id='cbInjury5' onclick="doSearch();" />Fatality <span id='label-red'>(red)</span> - 12 total</label></li>
-						<li><label for='cbInjury1'><input type='radio' name="injuryType" id='cbInjury1' onclick="doSearch();" />Incapacitating injury <span id='label-purple'>(purple)</span> - 490 total</label></li>
-						<li><label for='cbInjury2'><input type='radio' name="injuryType" id='cbInjury2' onclick="doSearch();" />Non-incapacitating injury <span id='label-yellow'>(yellow)</span> - 2,237 total</label></li>
-						<li><label for='cbInjury3'><input type='radio' name="injuryType" id='cbInjury3' onclick="doSearch();" />Possible injury <span id='label-blue'>(blue)</span> - 1,884 total</label></li>
-						<li><label for='cbInjury4'><input type='radio' name="injuryType" id='cbInjury4' onclick="doSearch();" />Property damage <span id='label-green'>(green)</span> - 308 total</label></li>
-					</ul>
 					<p><label for='cbIntersection'><input type='checkbox' name="cbIntersection" id='cbIntersection' /> At an intersection</label></p>
-					<h4>Day of the week</h4>
-					<ul class='options-h options-days'>
-						<li><label for='cbDaySun'><input type='radio' name="dayOfWeek" id='cbDaySun' />Sun</label></li>
-						<li><label for='cbDayMon'><input type='radio' name="dayOfWeek" id='cbDayMon' />Mon</label></li>
-						<li><label for='cbDayTue'><input type='radio' name="dayOfWeek" id='cbDayTue' />Tue</label></li>
-						<li><label for='cbDayWed'><input type='radio' name="dayOfWeek" id='cbDayWed' />Wed</label></li>
-						<li><label for='cbDayThu'><input type='radio' name="dayOfWeek" id='cbDayThu' />Thu</label></li>
-						<li><label for='cbDayFri'><input type='radio' name="dayOfWeek" id='cbDayFri' />Fri</label></li>
-						<li><label for='cbDaySat'><input type='radio' name="dayOfWeek" id='cbDaySat' />Sat</label></li>
-					</ul>
 					<h4>Environment</h4>
 					<p><select id='ddlWeather'>
 						<option value=''>Select type of weather </option>
