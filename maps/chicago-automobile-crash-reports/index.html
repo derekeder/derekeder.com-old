@@ -148,7 +148,7 @@
 		{
 			if (address.toLowerCase().indexOf("chicago") == -1)
 				address = address + " chicago";
-			_trackClickEventWithGA("Search", "Map", address);	
+			_trackClickEventWithGA("Search", "Chicago Automobile Crash Reports", address);	
 			geocoder.geocode( { 'address': address}, function(results, status) 
 			{
 			  if (status == google.maps.GeocoderStatus.OK) 
@@ -236,6 +236,7 @@
 <body>
 		<div id="page"> 
 			<h1>Chicago Automobile Crash Reports</h1>
+			<span class='tagline r'><a href='/'>Back to derekeder.com &raquo;</a></span>
 			<span class='tagline'>309,425 reported automobile crashes in the City of Chicago from 2007-2009, as reported to the Illinois Department of Transportation.</span>
 			<hr />
 			<div class="content-secondary">

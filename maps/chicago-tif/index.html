@@ -188,7 +188,7 @@
 		{
 			if (address.toLowerCase().indexOf("chicago") == -1)
 				address = address + " chicago";
-			_trackClickEventWithGA("Search", "Map", address);
+			_trackClickEventWithGA("Search", "Chicago TIF Projects", address);
 			geocoder.geocode( { 'address': address}, function(results, status) 
 			{
 			  if (status == google.maps.GeocoderStatus.OK) 
@@ -252,9 +252,9 @@
 <body onload="initialize()">
 		<div id="page"> 
 			<h1>Chicago TIF Projects</h1>
+			<span class='tagline r'><a href='about.html'>About this project &raquo;</a><br /><a href='/'>Back to derekeder.com &raquo;</a></span>
 			<span class='tagline'>A map and search tool for Chicago's 171 Tax Increment Financing (TIF) projects authorized by the city from Jan. 1, 2000, through July 30, 2010.<br />
 			<a href='http://www.scribd.com/doc/46571575'>See the list of projects</a> provided by the <a href='http://www.cityofchicago.org/city/en/depts/dcd.html'>Chicago Department of Housing and Economic Development</a>.</span>
-			<span class='tagline r'><a href='about.html'>About this project &raquo;</a></span>
 			<hr />
 			<div class="content-secondary">
 				<strong>Show layers</strong><br />

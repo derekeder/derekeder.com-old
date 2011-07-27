@@ -100,7 +100,7 @@
 		{
 			if (address.toLowerCase().indexOf("IL") == -1)
 				address = address + " IL";
-			_trackClickEventWithGA("Search", "Map", address);
+			_trackClickEventWithGA("Search", "2011 IL Senate Redistricting Plan", address);
 			geocoder.geocode( { 'address': address}, function(results, status) 
 			{
 			  if (status == google.maps.GeocoderStatus.OK) 
@@ -179,6 +179,7 @@
 <body>
 		<div id="page"> 
 			<h1>2011 IL Senate Redistricting Plan</h1>
+			<span class='tagline r'><a href='/'>Back to derekeder.com &raquo;</a></span>
 			<hr />
 			<div class="content-secondary">
 				<strong>Show layers</strong><br />
