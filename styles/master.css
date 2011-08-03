@@ -92,8 +92,8 @@ ul.c2l, ul.c2r { list-style: none; margin-left: 0; }
 .content-home h3 { font-size: 18px; }
 .content-home p { font-size: 16px; margin-bottom: 1.5em; }
 .content-home .mute { font-size:14px; }
-.home-left { float: left; width: 23%; padding: 0 5px; }
-.home-right { float: right; width: 73%; }
+.home-left { float: left; width: 28%; padding: 0 5px; }
+.home-right { float: right; width: 68%; }
 .content-simple { margin: auto; width: 700px; } 
 .content-simple  p { margin-top: .25em; }
 
