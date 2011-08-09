@@ -87,13 +87,6 @@ ul.c2l, ul.c2r { list-style: none; margin-left: 0; }
 
 .content-primary { float: right; padding-left: 10px; width: 65%; height: 95%; }
 .content-secondary { float: left; width: 33%; }
-.content-home { margin: auto; padding: 50px 0; width: 900px; font-size: 16px; }
-.content-home h1 { width: 100%; }
-.content-home h3 { font-size: 18px; }
-.content-home p { font-size: 16px; margin-bottom: 1.5em; }
-.content-home .mute { font-size:14px; }
-.home-left { float: left; width: 28%; padding: 0 5px; }
-.home-right { float: right; width: 68%; }
 .content-simple { margin: auto; width: 700px; } 
 .content-simple  p { margin-top: .25em; }
 
@@ -102,6 +95,19 @@ ul.c2l, ul.c2r { list-style: none; margin-left: 0; }
 	.full .content-primary { float: none; margin: 0 auto; padding-top: 1em; width: 100%; }
 	.full .content-secondary { display: none; }
 	
+/* Home */
+.content-home { margin: auto; padding: 30px 0; width: 900px; font-size: 16px; }
+.content-home h1 { width: 100%; }
+.content-home h2 { font-size: 20px; font-weight: normal; margin-bottom: 0; }
+.content-home h3 { font-size: 18px; }
+.content-home p { font-size: 16px; margin-bottom: 1.5em; }
+.content-home hr { margin-top: 0; }
+.twtr-tweet p { font-size: 12px; }
+.content-home .mute { font-size:14px; }
+.home-left { float: left; width: 28%; padding: 0 5px; }
+.home-right { float: right; width: 68%; padding-top: 15px; }
+	
+/* Maps */
 #map_canvas { height: 100%; width:100%; }
 #map_canvas img { float: right; padding-bottom: 8px; }
 #map_canvas h5 { clear: both; }
