@@ -154,6 +154,7 @@
 	
 	function displayCount(searchStr) {
 	  //set the query using the parameter
+	  searchStr = searchStr.replace('SELECT Address ','SELECT Count() ');
 	  var queryText = encodeURIComponent(searchStr);
 	  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
 	  
@@ -163,11 +164,11 @@
  
 	//define callback function, this is called when the results are returned
 	function getData(response) {
-	  numRows = response.getDataTable().getNumberOfRows();
-	  if (numRows == "500")
-		numRows = "500+";
+	  var numRows = 0;
+	  if (response.getDataTable().getNumberOfRows() > 0)
+	  	numRows = parseInt(response.getDataTable().getValue(0, 0));
 	  var name = "buildings";
-	  if (numRows == "1")
+	  if (numRows == 1)
 		name = "building";
 	  $( "#resultCount" ).fadeOut(function() {
         $( "#resultCount" ).html("found " + numRows + " " + name);

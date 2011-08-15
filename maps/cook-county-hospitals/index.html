@@ -166,6 +166,7 @@
 	
 	function displayCount(searchStr) {
 	  //set the query using the parameter
+	  searchStr = searchStr.replace('SELECT geometry ','SELECT Count() ');
 	  var queryText = encodeURIComponent(searchStr);
 	  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
 	  
@@ -175,20 +176,12 @@
  
 	//define callback function, this is called when the results are returned
 	function getData(response) {
-	  numRows = "No results found";
-	  name = "";
-	  data = response.getDataTable();
-	  if (data != null)
-	  {
-		  numRows = response.getDataTable().getNumberOfRows();
-		  //can only return up to 500 ... so we say 500+ when we get that result
-		  if (numRows == "500")
-			numRows = "500+";
-		  var name = "results";
-		  if (numRows == "1")
-			name = "result";
-	  }
-	  
+	  var numRows = 0;
+	  if (response.getDataTable().getNumberOfRows() > 0)
+	  	numRows = parseInt(response.getDataTable().getValue(0, 0));
+	  var name = "hospitals";
+	  if (numRows == 1)
+		name = "hospital";
 	  $( "#resultCount" ).fadeOut(function() {
         $( "#resultCount" ).html("found " + numRows + " " + name);
       });
