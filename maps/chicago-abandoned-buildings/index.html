@@ -9,6 +9,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 <script src="/source/analytics_lib.js" type="text/javascript"></script>
+<script src="/source/maps_lib.js" type="text/javascript"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script src="/source/jquery.ezpz_hint.min.js" type="text/javascript"></script>
 <link href='/styles/master.css' media='all' rel='stylesheet' type='text/css' />
@@ -21,9 +22,12 @@
   
   var fusionTableId = 580362;
   var searchRadius = 1610; //in meters ~ 1 mile
+  var recordName = "building";
+  var recordNamePlural = "buildings";
   var searchBuildings;
   var buildings = new google.maps.FusionTablesLayer(fusionTableId);
   var searchStr;
+  var searchRadiusCircle;
   
   google.load('visualization', '1', {}); //used for custom SQL call to get count
   
@@ -39,36 +43,36 @@
     };
     map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
 	
-	document.getElementById("ddlRadius").value = "805";
+	$("#ddlRadius").val("805");
     
-    document.getElementById("cbOccupied").checked = true;
-	document.getElementById("cbVacant").checked = true;
-	document.getElementById("cbUnknown").checked = true;
+    $("#cbOccupied").attr("checked", "checked");
+	$("#cbVacant").attr("checked", "checked");
+	$("#cbUnknown").attr("checked", "checked");
 	
-	document.getElementById("cbFire1").checked = true;
-	document.getElementById("cbFire2").checked = true;
-	document.getElementById("cbFire3").checked = true;
+	$("#cbFire1").attr("checked", "checked");
+	$("#cbFire2").attr("checked", "checked");
+	$("#cbFire3").attr("checked", "checked");
 	
 	searchBuildings = null;
 	
 	buildings.setMap(map);
-	document.getElementById("txtSearchAddress").value = "";
+	$("#txtSearchAddress").val("");
   }
 	
 	function doSearch() 
 	{
 		clearSearch();
-		var address = document.getElementById("txtSearchAddress").value;
+		var address = $("#txtSearchAddress").val();
 		
-		searchRadius = document.getElementById("ddlRadius").value;
+		searchRadius = $("#ddlRadius").val();
 		
-		var occupied = document.getElementById("cbOccupied").checked;
-		var vacant = document.getElementById("cbVacant").checked;
-		var unknown = document.getElementById("cbUnknown").checked;
+		var occupied = $("#cbOccupied").is(':checked');
+		var vacant = $("#cbVacant").is(':checked');
+		var unknown = $("#cbUnknown").is(':checked');
 		
-		var fire1 = document.getElementById("cbFire1").checked;
-		var fire2 = document.getElementById("cbFire2").checked;
-		var fire3 = document.getElementById("cbFire3").checked;
+		var fire1 = $("#cbFire1").is(':checked');
+		var fire2 = $("#cbFire2").is(':checked');
+		var fire3 = $("#cbFire3").is(':checked');
 		
 		searchStr = "SELECT Address FROM " + fusionTableId + " WHERE Address not equal to ''";
 		
@@ -113,6 +117,7 @@
 				  animation: google.maps.Animation.DROP,
 				  title:address
 				});
+				drawSearchRadiusCircle(results[0].geometry.location);
 				
 				searchStr += " AND ST_INTERSECTS(Address, CIRCLE(LATLNG" + results[0].geometry.location.toString() + "," + searchRadius + "))";
 				
@@ -147,33 +152,10 @@
 			searchBuildings.setMap(null);
 		if (addrMarker != null)
 			addrMarker.setMap(null);	
+		if (searchRadiusCircle != null)
+			searchRadiusCircle.setMap(null);
 		
 		buildings.setMap(null);
-		
-	}
-	
-	function displayCount(searchStr) {
-	  //set the query using the parameter
-	  searchStr = searchStr.replace('SELECT Address ','SELECT Count() ');
-	  var queryText = encodeURIComponent(searchStr);
-	  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
-	  
-	  //set the callback function
-	  query.send(getData);
-	}
- 
-	//define callback function, this is called when the results are returned
-	function getData(response) {
-	  var numRows = 0;
-	  if (response.getDataTable().getNumberOfRows() > 0)
-	  	numRows = parseInt(response.getDataTable().getValue(0, 0));
-	  var name = "buildings";
-	  if (numRows == 1)
-		name = "building";
-	  $( "#resultCount" ).fadeOut(function() {
-        $( "#resultCount" ).html("found " + numRows + " " + name);
-      });
-	  $( "#resultCount" ).fadeIn();
 	}
 	
 	jQuery(function() {
@@ -209,7 +191,7 @@
 					</ul>
 					<div class='clear'></div>
 					<div class='input-addr'>
-						<h4>Address</h4>
+						<h4>Address <span class='mute'>(<a href='#' onclick="findMe(); return false;">find me</a>)</span></h4>
 						<p><input class='txt hint' type="text" title="Enter an address or an intersection &hellip;" id="txtSearchAddress" onkeydown="if (event.keyCode == 13) document.getElementById('btnSearch').click()"/></p>
 					</div>
 					<div class='input-radius'>
