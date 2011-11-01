@@ -1,3 +1,0 @@
-[10-Mar-2011 20:22:15] PHP Warning:  Invalid argument supplied for foreach() in /home/derekede/public_html/maps/sql/sql.php on line 54
-[10-Mar-2011 20:33:13] PHP Parse error:  syntax error, unexpected T_OBJECT_OPERATOR in /home/derekede/public_html/maps/sql/run_ft_sql.php on line 25
-[10-Mar-2011 20:34:36] PHP Parse error:  syntax error, unexpected $end in /home/derekede/public_html/maps/sql/run_ft_sql.php on line 45
