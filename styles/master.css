@@ -100,7 +100,7 @@ ul.c2l, ul.c2r { list-style: none; margin-left: 0; }
 p.footer { margin-bottom: 0.4em; }
 	
 /* Home */
-.content-home { margin: auto; padding: 30px 0; width: 900px; font-size: 16px; }
+.content-home { margin: auto; padding: 10px 0; width: 900px; font-size: 16px; }
 .content-home h1 { width: 100%; }
 .content-home h2 { font-size: 20px; font-weight: normal; margin-bottom: 0; }
 .content-home h3 { font-size: 18px; }
@@ -109,7 +109,7 @@ p.footer { margin-bottom: 0.4em; }
 .twtr-tweet p { font-size: 12px; }
 .content-home .mute { font-size:14px; }
 .home-left { float: left; width: 28%; padding: 0 5px; }
-.home-right { float: right; width: 68%; padding-top: 15px; }
+.home-right { float: right; width: 68%; padding-top: 5px; }
 
 /* Hint text boxes */
   .ezpz-hint { color: #777; font-style: italic; }
@@ -161,7 +161,7 @@ p.footer { margin-bottom: 0.4em; }
 p.mute { margin: 0; }
 
 /* Options */
-.options-h, .options-v { list-style: none; margin: 0 0 1em 0; padding: 0; }
+.options-h, .options-v { list-style: none; margin: 0 0 0.7em 0; padding: 0; }
 td .options-h, td .options-v { margin: 0; }
 .options-h input, .options-v input { margin-bottom: -0.05em; }
 .options-h img { border-bottom: 3px solid #fff; padding: 5px; vertical-align: middle; }
