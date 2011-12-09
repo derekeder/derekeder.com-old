@@ -5,8 +5,8 @@
 
 /* Imports
 =====================================================================*/
-@import "/styles/reset.css"; /* Reset styles */
-@import "/styles/ie.css"; /* IE styles */
+@import "reset.css"; /* Reset styles */
+@import "ie.css"; /* IE styles */
 
 
 /* Fonts
@@ -45,7 +45,7 @@ table { border-collapse: collapse; }
 table p { margin: 0; }
 td { vertical-align: top; }
 thead th { font-size: 1em; padding: 0 0.4em 0.25em; }
-ul { list-style: disc; margin-left: 0; }
+ul { list-style: disc; margin-left: 1.5em; }
 ul ol li { background: none; padding: 0; }
 
 /* Stock classes */
@@ -104,7 +104,7 @@ p.footer { margin-bottom: 0.4em; }
 .content-home h1 { width: 100%; }
 .content-home h2 { font-size: 20px; font-weight: normal; margin-bottom: 0; }
 .content-home h3 { font-size: 18px; }
-.content-home p { font-size: 16px; margin-bottom: 1.5em; }
+.content-home p { font-size: 16px; margin-bottom: 1em; }
 .content-home hr { margin-top: 0; }
 .twtr-tweet p { font-size: 12px; }
 .content-home .mute { font-size:14px; }
