@@ -19,7 +19,7 @@ body, input, select, textarea { font-family: Calibri, Arial, sans-serif; }
 a { color: #366cb3; text-decoration: none; }
 a:hover { text-decoration: underline; }
 address { font-style: normal; }
-blockquote, dl, ol, p, table, ul { margin-bottom: 1em; font-size: 15px; }
+blockquote, dl, ol, p, table, ul { margin-bottom: 1em; font-size: 16px; }
 body { height: 100%; color: #58595b; font-size: 16px; line-height: 1.35; padding: 0; margin: 0;}
 cite, em { font-style: italic; }
 dt { margin-top: 1.35em; }
@@ -87,7 +87,7 @@ ul.c2l, ul.c2r { list-style: none; margin-left: 0; }
 
 .content-primary { float: right; padding-left: 10px; width: 65%; height: 95%; }
 .content-secondary { float: left; width: 33%; }
-.content-simple { margin: auto; width: 700px; } 
+.content-simple { margin: auto; width: 900px; } 
 .content-simple  p { margin-top: .25em; }
 
 	/* Full layout (no secondary content) */
@@ -104,7 +104,7 @@ p.footer { margin-bottom: 0.4em; }
 .content-home h1 { width: 100%; }
 .content-home h2 { font-size: 20px; font-weight: normal; margin-bottom: 0; }
 .content-home h3 { font-size: 18px; }
-.content-home p { font-size: 16px; margin-bottom: 1em; }
+.content-home p { font-size: 16px; margin-bottom: 2em; }
 .content-home hr { margin-top: 0; }
 .twtr-tweet p { font-size: 12px; }
 .content-home .mute { font-size:14px; }
@@ -125,7 +125,7 @@ p.footer { margin-bottom: 0.4em; }
 	#layer-button-wards { color: #80B16A; font-weight: bold; }
 	#layer-button-districts { color: #3D85C6; font-weight: bold; }
 	
-	.tagline { font-size: 15px; }
+	.tagline { font-size: 16px; }
 	
 	.btn {
 	  background: #4A7ABA;
@@ -154,7 +154,7 @@ p.footer { margin-bottom: 0.4em; }
 	#label-purple { color: #cc66cc; }
 	#label-red { color: #d73e3e; }
 	
-	#resultCount { float: right; font-weight: bold; font-size: 15px; margin-top: 8px; }
+	#resultCount { float: right; font-weight: bold; font-size: 16px; margin-top: 8px; }
 	
 /* Muted text */
 .mute { color: #77787b; font-size: 12px; }
